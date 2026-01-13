@@ -31,3 +31,19 @@ STATE.md
 TODO.md
 archive/**
 *.vsix
+
+# AI tooling (local dev only)
+ai/**
+.gitmodules
+CLAUDE.md
+.cursorrules
+.cursor/**
+CODEX.md
+.codex/**
+GEMINI.md
+.gemini/**
+SKILLS.md
+
+# Git config files
+.gitleaks.toml
+.releaserc.json
