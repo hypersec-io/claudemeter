@@ -1,3 +1,10 @@
+# 1.0.0 (2026-01-13)
+
+
+### Bug Fixes
+
+* add keywords to extension for marketplace ([540fa7b](https://github.com/hypersec-io/claudemeter/commit/540fa7bbc6f5316c3c69bd1f8e081dafbb4426a7))
+
 ## [1.2.1](https://github.com/hypersec-io/claudemeter/compare/v1.2.0...v1.2.1) (2026-01-13)
 
 
