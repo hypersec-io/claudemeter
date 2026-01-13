@@ -25,6 +25,9 @@
   "engines": {
     "vscode": "^1.80.0"
   },
+  "extensionKind": [
+    "ui"
+  ],
   "keywords": [
     "claude",
     "claude ai",
