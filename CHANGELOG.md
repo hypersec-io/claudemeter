@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/hypersec-io/claudemeter/compare/v1.0.0...v1.0.1) (2026-01-13)
+
+
+### Bug Fixes
+
+* exclude AI tooling from VSIX package ([e178d6f](https://github.com/hypersec-io/claudemeter/commit/e178d6ffe0b80e0e48b520b293568928867b0001))
+
 # 1.0.0 (2026-01-13)
 
 
