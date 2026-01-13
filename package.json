@@ -1,7 +1,7 @@
 {
   "name": "claudemeter",
-  "displayName": "Claudemeter",
-  "description": "Monitor Claude.ai web usage and Claude Code token consumption in VS Code. Real-time tracking with per-gauge thresholds, headless browser operation, and project-specific isolation.",
+  "displayName": "Claudemeter - Claude AI Usage Monitor",
+  "description": "Complete Claude.ai account monitoring: session limits, weekly limits, token usage, reset times, and spending caps. Track all Claude Code and Claude Pro/Max plan quotas in real-time from your status bar.",
   "version": "1.2.1",
   "publisher": "HyperSec",
   "author": {
@@ -18,10 +18,44 @@
   "homepage": "https://github.com/hypersec-io/claudemeter#readme",
   "license": "MIT",
   "icon": "assets/claudemeter-logo-icon-128.png",
+  "galleryBanner": {
+    "color": "#1a1a2e",
+    "theme": "dark"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
+  "keywords": [
+    "claude",
+    "claude ai",
+    "claude code",
+    "anthropic",
+    "token",
+    "tokens",
+    "usage",
+    "monitor",
+    "tracker",
+    "limit",
+    "limits",
+    "rate limit",
+    "weekly limit",
+    "session limit",
+    "context window",
+    "quota",
+    "pro plan",
+    "max plan",
+    "sonnet",
+    "opus",
+    "status bar",
+    "ai assistant",
+    "llm",
+    "api usage",
+    "reset time",
+    "spending cap",
+    "credits"
+  ],
   "categories": [
+    "Visualization",
     "Other"
   ],
   "activationEvents": [
