@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/hypersec-io/claudemeter/compare/v1.0.2...v1.1.0) (2026-01-13)
+
+
+### Features
+
+* support Remote SSH sessions ([96350d7](https://github.com/hypersec-io/claudemeter/commit/96350d765fd63000f0a6e73a5253d17b50966a92)), closes [#1](https://github.com/hypersec-io/claudemeter/issues/1)
+
 ## [1.0.2](https://github.com/hypersec-io/claudemeter/compare/v1.0.1...v1.0.2) (2026-01-13)
 
 
