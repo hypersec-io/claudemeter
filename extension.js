@@ -28,28 +28,6 @@ let jsonlWatcher;
 let loginWasCancelled = false;
 
 let tokenDiagnosticChannel = null;
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-
-// Debug log path in config dir (~/.config/claudemeter/debug.log on Linux)
-function getDebugLogPath() {
-    let configDir;
-    if (process.platform === 'win32') {
-        configDir = path.join(process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming'), 'claudemeter');
-    } else if (process.platform === 'darwin') {
-        configDir = path.join(os.homedir(), 'Library', 'Application Support', 'claudemeter');
-    } else {
-        configDir = path.join(process.env.XDG_CONFIG_HOME || path.join(os.homedir(), '.config'), 'claudemeter');
-    }
-    try {
-        if (!fs.existsSync(configDir)) {
-            fs.mkdirSync(configDir, { recursive: true });
-        }
-    } catch (e) { /* ignore */ }
-    return path.join(configDir, 'debug.log');
-}
-let debugLogFile = null;
 
 function getTokenDiagnosticChannel() {
     if (!tokenDiagnosticChannel) {
@@ -58,26 +36,10 @@ function getTokenDiagnosticChannel() {
     return tokenDiagnosticChannel;
 }
 
-// Only logs when debug mode is enabled
 function debugLog(message) {
-    if (!isDebugEnabled()) {
-        return;
+    if (isDebugEnabled()) {
+        getTokenDiagnosticChannel().appendLine(message);
     }
-
-    const timestamp = new Date().toISOString();
-    const logLine = `[${timestamp}] ${message}`;
-
-    // Write to file when debug enabled
-    try {
-        if (!debugLogFile) {
-            debugLogFile = getDebugLogPath();
-        }
-        fs.appendFileSync(debugLogFile, logLine + '\n');
-    } catch (e) {
-        // ignore file write errors
-    }
-
-    getTokenDiagnosticChannel().appendLine(message);
 }
 
 // Fetch with spinner, error handling, and login state management
@@ -188,38 +150,9 @@ async function fetchUsage(isManualRetry = false) {
 }
 
 async function updateStatusBarWithAllData() {
-    debugLog('updateStatusBarWithAllData() called');
-
-    // Always refresh token data from JSONL files to ensure we have the latest values
-    // This prevents stale data when performFetch() is called after initial token monitoring setup
-    if (claudeDataLoader && sessionTracker) {
-        try {
-            const usage = await claudeDataLoader.getCurrentSessionUsage();
-            debugLog(`   JSONL usage: isActive=${usage.isActive}, totalTokens=${usage.totalTokens}`);
-            if (usage.isActive && usage.totalTokens > 0) {
-                await sessionTracker.updateTokens(usage.totalTokens, getTokenLimit());
-                debugLog(`   Updated sessionTracker with ${usage.totalTokens} tokens`);
-            } else {
-                debugLog(`   NOT updating sessionTracker (isActive=${usage.isActive}, totalTokens=${usage.totalTokens})`);
-            }
-        } catch (error) {
-            debugLog(`   Error refreshing tokens: ${error.message}`);
-        }
-    } else {
-        debugLog(`   claudeDataLoader=${!!claudeDataLoader}, sessionTracker=${!!sessionTracker}`);
-    }
-
     const sessionData = sessionTracker ? await sessionTracker.getCurrentSession() : null;
-    if (sessionData && sessionData.tokenUsage) {
-        const pct = Math.round((sessionData.tokenUsage.current / sessionData.tokenUsage.limit) * 100);
-        debugLog(`   sessionData.tokenUsage: current=${sessionData.tokenUsage.current}, limit=${sessionData.tokenUsage.limit}, pct=${pct}%`);
-    } else {
-        debugLog(`   sessionData has no tokenUsage`);
-    }
-
     const activityStats = activityMonitor ? activityMonitor.getStats(usageData, sessionData) : null;
     updateStatusBar(statusBarItem, usageData, activityStats, sessionData);
-    debugLog('updateStatusBarWithAllData() complete');
 }
 
 function createAutoRefreshTimer(minutes) {
@@ -236,8 +169,6 @@ function createAutoRefreshTimer(minutes) {
 
 // Monitor Claude Code token usage via JSONL files in ~/.config/claude/projects/
 async function setupTokenMonitoring(context) {
-    debugLog('setupTokenMonitoring() starting...');
-
     context.subscriptions.push({
         dispose: () => {
             if (tokenDiagnosticChannel) {
@@ -248,14 +179,15 @@ async function setupTokenMonitoring(context) {
     });
 
     const workspacePath = vscode.workspace.workspaceFolders?.[0]?.uri?.fsPath || null;
-    debugLog(`Workspace path = ${workspacePath || '(none)'}`);
+    if (workspacePath) {
+        debugLog(`Workspace path: ${workspacePath}`);
+    } else {
+        debugLog('No workspace folder open - will use global token search');
+    }
 
     claudeDataLoader = new ClaudeDataLoader(workspacePath, debugLog);
-    debugLog(`Project dir name = ${claudeDataLoader.projectDirName || '(none)'}`);
 
     const claudeDir = await claudeDataLoader.findClaudeDataDirectory();
-    debugLog(`Claude data dir = ${claudeDir || '(not found)'}`);
-
     if (!claudeDir) {
         debugLog('Claude data directory not found');
         debugLog('Checked locations:');
@@ -264,9 +196,10 @@ async function setupTokenMonitoring(context) {
         return;
     }
 
+    debugLog(`Found Claude data directory: ${claudeDir}`);
+
     // Only watch project-specific directory to prevent cross-project contamination
     const projectDir = await claudeDataLoader.getProjectDataDirectory();
-    debugLog(`Project-specific dir = ${projectDir || '(not found)'}`);
 
     if (!projectDir) {
         debugLog(`Project directory not found for workspace: ${workspacePath}`);
@@ -306,10 +239,8 @@ async function setupTokenMonitoring(context) {
 }
 
 async function updateTokensFromJsonl(silent = false) {
-    debugLog('updateTokensFromJsonl() called');
     try {
         const usage = await claudeDataLoader.getCurrentSessionUsage();
-        debugLog(`getCurrentSessionUsage returned: isActive=${usage.isActive}, totalTokens=${usage.totalTokens}, activeSessionCount=${usage.activeSessionCount || 0}`);
 
         if (!silent) {
             if (usage.isActive) {
