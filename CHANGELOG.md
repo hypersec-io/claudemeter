@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/hypersec-io/claudemeter/compare/v1.1.1...v1.1.2) (2026-01-15)
+
+
+### Bug Fixes
+
+* multi-session support showing highest token usage ([aa6b4a6](https://github.com/hypersec-io/claudemeter/commit/aa6b4a6263b9dcbab8f891b4c69ade2748f04409))
+
 ## [1.1.1](https://github.com/hypersec-io/claudemeter/compare/v1.1.0...v1.1.1) (2026-01-13)
 
 
