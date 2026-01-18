@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/hypersec-io/claudemeter/compare/v1.1.3...v1.1.4) (2026-01-18)
+
+
+### Bug Fixes
+
+* multi-window browser coordination ([#3](https://github.com/hypersec-io/claudemeter/issues/3)) ([72aea5d](https://github.com/hypersec-io/claudemeter/commit/72aea5deb005efd5f42b52cc33cb275b6991438f))
+
 ## [1.1.3](https://github.com/hypersec-io/claudemeter/compare/v1.1.2...v1.1.3) (2026-01-15)
 
 
