@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/hypersec-io/claudemeter/compare/v1.2.0...v1.2.1) (2026-01-30)
+
+
+### Bug Fixes
+
+* prevent unnecessary login browser popup on transient errors ([936478f](https://github.com/hypersec-io/claudemeter/commit/936478f641f5e202d332ba294e1205a910be57fb))
+
 # [1.2.0](https://github.com/hypersec-io/claudemeter/compare/v1.1.4...v1.2.0) (2026-01-29)
 
 
