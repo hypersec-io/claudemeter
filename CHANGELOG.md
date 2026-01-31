@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/hypersec-io/claudemeter/compare/v1.2.3...v1.2.4) (2026-01-31)
+
+
+### Bug Fixes
+
+* separate poll intervals for local tokens and web scraping ([dfedf01](https://github.com/hypersec-io/claudemeter/commit/dfedf01c2cb75e02dce90988dda656d80330d3e4))
+
 ## [1.2.3](https://github.com/hypersec-io/claudemeter/compare/v1.2.2...v1.2.3) (2026-01-31)
 
 
