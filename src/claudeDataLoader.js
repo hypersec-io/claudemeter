@@ -23,9 +23,15 @@ class ClaudeDataLoader {
         }
     }
 
-    // Claude replaces forward slashes with dashes in directory names
+    // Claude replaces path separators with dashes in directory names
+    // Works for both Unix (/) and Windows (\) paths
     convertPathToClaudeDir(workspacePath) {
-        return workspacePath.replace(/\//g, '-');
+        // Replace both forward and back slashes with dashes
+        // Also handle Windows drive letters (C: -> C)
+        return workspacePath
+            .replace(/\\/g, '-')  // Windows backslashes
+            .replace(/\//g, '-')  // Unix forward slashes
+            .replace(/:/g, '');   // Remove colons from Windows drive letters
     }
 
     setWorkspacePath(workspacePath) {
@@ -69,8 +75,23 @@ class ClaudeDataLoader {
             paths.push(...envPath.split(',').map(p => p.trim()));
         }
 
+        // Standard locations (cross-platform)
         paths.push(path.join(homeDir, '.config', 'claude', 'projects'));
         paths.push(path.join(homeDir, '.claude', 'projects'));
+
+        // Windows-specific: AppData locations
+        if (process.platform === 'win32') {
+            const appData = process.env.APPDATA;
+            const localAppData = process.env.LOCALAPPDATA;
+            if (appData) {
+                paths.push(path.join(appData, 'claude', 'projects'));
+                paths.push(path.join(appData, 'Claude', 'projects'));
+            }
+            if (localAppData) {
+                paths.push(path.join(localAppData, 'claude', 'projects'));
+                paths.push(path.join(localAppData, 'Claude', 'projects'));
+            }
+        }
 
         return paths;
     }
