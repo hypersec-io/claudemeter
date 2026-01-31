@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/hypersec-io/claudemeter/compare/v1.2.2...v1.2.3) (2026-01-31)
+
+
+### Bug Fixes
+
+* cross-platform line ending handling for JSONL parsing ([971d3b2](https://github.com/hypersec-io/claudemeter/commit/971d3b23caf4e873ed739d629f0d693d52a17538))
+
 ## [1.2.2](https://github.com/hypersec-io/claudemeter/compare/v1.2.1...v1.2.2) (2026-01-31)
 
 
