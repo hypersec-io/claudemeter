@@ -9,7 +9,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const os = require('os');
-const { getTokenLimit, TIMEOUTS } = require('./utils');
+const { getTokenLimit, TIMEOUTS, splitLines } = require('./utils');
 
 class ClaudeDataLoader {
     constructor(workspacePath = null, debugLogger = null) {
@@ -140,7 +140,7 @@ class ClaudeDataLoader {
 
         try {
             const content = await fs.readFile(filePath, 'utf-8');
-            const lines = content.split('\n').filter(line => line.trim());
+            const lines = splitLines(content).filter(line => line.trim());
 
             for (const line of lines) {
                 try {
@@ -359,7 +359,7 @@ class ClaudeDataLoader {
             for (const fileInfo of recentFiles) {
                 try {
                     const content = await fs.readFile(fileInfo.path, 'utf-8');
-                    const lines = content.trim().split('\n');
+                    const lines = splitLines(content.trim());
 
                     // Parse from end to find last assistant message with cache data
                     for (let i = lines.length - 1; i >= 0; i--) {

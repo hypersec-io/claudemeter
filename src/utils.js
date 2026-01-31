@@ -14,6 +14,11 @@ const crypto = require('crypto');
 
 const CONFIG_NAMESPACE = 'claudemeter';
 
+// Split text into lines, handling both Unix (\n) and Windows (\r\n) line endings
+function splitLines(text) {
+    return text.split(/\r?\n/);
+}
+
 // Command IDs (must match package.json contributes.commands)
 const COMMANDS = {
     FETCH_NOW: 'claudemeter.fetchNow',
@@ -102,7 +107,7 @@ class FileLogger {
             if (stats.size >= this.maxSizeBytes) {
                 // FIFO trim: keep newest ~75% of max size, discard oldest entries
                 const content = fs.readFileSync(this.logFile, 'utf-8');
-                const lines = content.split('\n');
+                const lines = splitLines(content);
                 const targetSize = Math.floor(this.maxSizeBytes * 0.75);
 
                 // Find cut point to keep ~targetSize bytes from the end
@@ -343,5 +348,6 @@ module.exports = {
     initFileLogger,
     getFileLogger,
     fileLog,
-    getDefaultDebugLogPath
+    getDefaultDebugLogPath,
+    splitLines
 };
