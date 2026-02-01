@@ -237,6 +237,11 @@ function getTokenLimit() {
     return config.get('tokenLimit', DEFAULT_TOKEN_LIMIT);
 }
 
+function getUse24HourTime() {
+    const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
+    return config.get('statusBar.use24HourTime', false);
+}
+
 // Parse relative time string (e.g. "2h 30m", "5d 21h") and calculate reset datetime
 function calculateResetClockTime(resetTime, timeFormat = { hour: 'numeric', minute: '2-digit' }) {
     try {
@@ -252,15 +257,17 @@ function calculateResetClockTime(resetTime, timeFormat = { hour: 'numeric', minu
         const now = new Date();
         const resetDate = new Date(now.getTime() + totalMinutes * 60 * 1000);
 
+        const hour12 = !getUse24HourTime();
+
         if (totalMinutes >= 24 * 60) {
             // Multi-day: show "Fri 15:20" (day name + time) for clarity
             const dayName = resetDate.toLocaleDateString(undefined, { weekday: 'short' });
-            const timeStr = resetDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+            const timeStr = resetDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12 });
             return `${dayName} ${timeStr}`;
         }
 
         // Within 24 hours: show time
-        const timeStr = resetDate.toLocaleTimeString(undefined, timeFormat);
+        const timeStr = resetDate.toLocaleTimeString(undefined, { ...timeFormat, hour12 });
         return timeStr;
     } catch (error) {
         return '??:??';
@@ -287,7 +294,8 @@ function calculateResetClockTimeExpanded(resetTime) {
             day: 'numeric',
             month: 'long',
             hour: 'numeric',
-            minute: '2-digit'
+            minute: '2-digit',
+            hour12: !getUse24HourTime()
         });
     } catch (error) {
         return 'Unknown';
@@ -336,6 +344,7 @@ module.exports = {
     VIEWPORT,
     CLAUDE_URLS,
     getTokenLimit,
+    getUse24HourTime,
     setDevMode,
     isDebugEnabled,
     getDebugChannel,

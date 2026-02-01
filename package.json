@@ -172,6 +172,11 @@
           "default": true,
           "description": "Show Claude service status indicator. When enabled, displays a warning/error icon if Claude services are degraded or experiencing an outage."
         },
+        "claudemeter.statusBar.use24HourTime": {
+          "type": "boolean",
+          "default": false,
+          "description": "Display times in 24-hour format (e.g., 14:30 instead of 2:30 PM)"
+        },
         "claudemeter.thresholds.warning": {
           "type": "number",
           "default": 80,

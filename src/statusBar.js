@@ -7,7 +7,7 @@
 // Copyright: (c) 2026 HyperSec
 
 const vscode = require('vscode');
-const { COMMANDS, CONFIG_NAMESPACE, calculateResetClockTime, calculateResetClockTimeExpanded, getCurrencySymbol } = require('./utils');
+const { COMMANDS, CONFIG_NAMESPACE, calculateResetClockTime, calculateResetClockTimeExpanded, getCurrencySymbol, getUse24HourTime } = require('./utils');
 const { fetchServiceStatus, getStatusDisplay, formatStatusTime, STATUS_PAGE_URL } = require('./serviceStatus');
 
 const LABEL_TEXT = 'Claude';
@@ -596,7 +596,7 @@ function updateStatusBar(item, usageData, activityStats = null, sessionData = nu
 
     tooltipLines.push('');
     if (usageData) {
-        tooltipLines.push(`Updated: ${usageData.timestamp.toLocaleTimeString()}`);
+        tooltipLines.push(`Updated: ${usageData.timestamp.toLocaleTimeString(undefined, { hour12: !getUse24HourTime() })}`);
     }
     tooltipLines.push('Click to refresh');
 
