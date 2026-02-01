@@ -26,6 +26,58 @@ function isServiceStatusEnabled() {
 }
 
 /**
+ * Get status bar alignment from settings
+ * @returns {vscode.StatusBarAlignment}
+ */
+function getStatusBarAlignment() {
+    const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
+    const alignment = config.get('statusBar.alignment', 'right');
+    return alignment === 'left' ? vscode.StatusBarAlignment.Left : vscode.StatusBarAlignment.Right;
+}
+
+/**
+ * Get status bar priority from settings
+ * @returns {number}
+ */
+function getStatusBarPriority() {
+    const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
+    return config.get('statusBar.priority', 100);
+}
+
+/**
+ * Check if progress bars should be used instead of percentages
+ * @returns {boolean}
+ */
+function useProgressBars() {
+    const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
+    return config.get('statusBar.useProgressBars', false);
+}
+
+/**
+ * Format percentage as progress bar
+ * @param {number} percent - Percentage (0-100)
+ * @param {number} width - Bar width in characters
+ * @returns {string} Progress bar like "▓▓▓░░"
+ */
+function formatAsBar(percent, width = 5) {
+    const clamped = Math.max(0, Math.min(100, percent));
+    const filled = Math.round(clamped / 100 * width);
+    return '▓'.repeat(filled) + '░'.repeat(width - filled);
+}
+
+/**
+ * Format percentage, optionally as progress bar
+ * @param {number} percent - Percentage (0-100)
+ * @returns {string} Either "45%" or "▓▓░░░"
+ */
+function formatPercent(percent, forCompact = false) {
+    if (useProgressBars()) {
+        return formatAsBar(percent);
+    }
+    return forCompact ? `-${percent}%` : `${percent}%`;
+}
+
+/**
  * Get the label text with service status icon prefix (only when degraded/outage)
  * @returns {string} Label text like "Claude" or "$(warning) Claude" when issues
  */
@@ -208,13 +260,13 @@ function renderCompactMode(sessionPercent, weeklyPercent, tokenPercent, sessionS
 
     const parts = [LABEL_TEXT];
     if (sessionPercent !== null) {
-        parts.push(`S-${sessionPercent}%`);
+        parts.push(`S${formatPercent(sessionPercent, true)}`);
     }
     if (weeklyPercent !== null) {
-        parts.push(`Wk-${weeklyPercent}%`);
+        parts.push(`Wk${formatPercent(weeklyPercent, true)}`);
     }
     if (tokenPercent !== null) {
-        parts.push(`Tk-${tokenPercent}%`);
+        parts.push(`Tk${formatPercent(tokenPercent, true)}`);
     } else {
         parts.push('Tk-');
     }
@@ -271,10 +323,11 @@ function renderMultiPanelMode(
     let newSessionText = null;
     let sessionVisible = false;
     if (sessionPercent !== null) {
+        const sessionDisplay = formatPercent(sessionPercent);
         if (isMinimal) {
-            newSessionText = `${sessionStatus.icon ? sessionStatus.icon + ' ' : ''}Se ${sessionPercent}%`;
+            newSessionText = `${sessionStatus.icon ? sessionStatus.icon + ' ' : ''}Se ${sessionDisplay}`;
         } else {
-            newSessionText = `${sessionStatus.icon ? sessionStatus.icon + ' ' : ''}Se ${sessionPercent}% $(history) ${sessionResetTime}`;
+            newSessionText = `${sessionStatus.icon ? sessionStatus.icon + ' ' : ''}Se ${sessionDisplay} $(history) ${sessionResetTime}`;
         }
         sessionVisible = true;
     }
@@ -293,10 +346,11 @@ function renderMultiPanelMode(
     let newWeeklyText = null;
     let weeklyVisible = false;
     if (weeklyPercent !== null) {
+        const weeklyDisplay = formatPercent(weeklyPercent);
         if (isMinimal) {
-            newWeeklyText = `${weeklyStatus.icon ? weeklyStatus.icon + ' ' : ''}Wk ${weeklyPercent}%`;
+            newWeeklyText = `${weeklyStatus.icon ? weeklyStatus.icon + ' ' : ''}Wk ${weeklyDisplay}`;
         } else {
-            newWeeklyText = `${weeklyStatus.icon ? weeklyStatus.icon + ' ' : ''}Wk ${weeklyPercent}% $(history) ${weeklyResetTime}`;
+            newWeeklyText = `${weeklyStatus.icon ? weeklyStatus.icon + ' ' : ''}Wk ${weeklyDisplay} $(history) ${weeklyResetTime}`;
         }
         weeklyVisible = true;
     }
@@ -315,7 +369,8 @@ function renderMultiPanelMode(
     let newTokensText = null;
     let tokensVisible = false;
     if (tokenPercent !== null) {
-        newTokensText = `${tokenStatus.icon ? tokenStatus.icon + ' ' : ''}Tk ${tokenPercent}%`;
+        const tokenDisplay = formatPercent(tokenPercent);
+        newTokensText = `${tokenStatus.icon ? tokenStatus.icon + ' ' : ''}Tk ${tokenDisplay}`;
         tokensVisible = true;
     } else {
         newTokensText = 'Tk -';
@@ -336,7 +391,8 @@ function renderMultiPanelMode(
     let newSonnetText = null;
     if (showSonnet && usageData && usageData.usagePercentSonnet !== null && usageData.usagePercentSonnet !== undefined) {
         const sonnetStatus = getIconAndColor(usageData.usagePercentSonnet, sonnetThresholds.warning, sonnetThresholds.error);
-        newSonnetText = `${sonnetStatus.icon ? sonnetStatus.icon + ' ' : ''}${usageData.usagePercentSonnet}%S`;
+        const sonnetDisplay = formatPercent(usageData.usagePercentSonnet);
+        newSonnetText = `${sonnetStatus.icon ? sonnetStatus.icon + ' ' : ''}${sonnetDisplay}S`;
 
         if (newSonnetText !== lastDisplayedValues.sonnetText) {
             statusBarItems.sonnet.text = newSonnetText;
@@ -352,7 +408,8 @@ function renderMultiPanelMode(
     let newOpusText = null;
     if (showOpus && usageData && usageData.usagePercentOpus !== null && usageData.usagePercentOpus !== undefined) {
         const opusStatus = getIconAndColor(usageData.usagePercentOpus, opusThresholds.warning, opusThresholds.error);
-        newOpusText = `${opusStatus.icon ? opusStatus.icon + ' ' : ''}${usageData.usagePercentOpus}%O`;
+        const opusDisplay = formatPercent(usageData.usagePercentOpus);
+        newOpusText = `${opusStatus.icon ? opusStatus.icon + ' ' : ''}${opusDisplay}O`;
 
         if (newOpusText !== lastDisplayedValues.opusText) {
             statusBarItems.opus.text = newOpusText;
@@ -373,7 +430,8 @@ function renderMultiPanelMode(
         const usedDisplay = credits.used >= 1000
             ? `${(credits.used / 1000).toFixed(1)}K`
             : Math.round(credits.used);
-        newCreditsText = `${creditsStatus.icon ? creditsStatus.icon + ' ' : ''}${currencySymbol}${usedDisplay}/${credits.percent}%`;
+        const creditsDisplay = formatPercent(credits.percent);
+        newCreditsText = `${creditsStatus.icon ? creditsStatus.icon + ' ' : ''}${currencySymbol}${usedDisplay}/${creditsDisplay}`;
 
         if (newCreditsText !== lastDisplayedValues.creditsText) {
             statusBarItems.credits.text = newCreditsText;
@@ -389,12 +447,13 @@ function renderMultiPanelMode(
 
 // Main functions
 
-// High base priority keeps our items grouped together in the status bar
+// Priority offset keeps our items grouped together in the status bar
 function createStatusBarItem(context) {
-    const basePriority = 1000;
+    const alignment = getStatusBarAlignment();
+    const basePriority = getStatusBarPriority();
 
     statusBarItems.label = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority
     );
     statusBarItems.label.command = COMMANDS.FETCH_NOW;
@@ -403,49 +462,49 @@ function createStatusBarItem(context) {
     context.subscriptions.push(statusBarItems.label);
 
     statusBarItems.session = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 1
     );
     statusBarItems.session.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.session);
 
     statusBarItems.weekly = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 2
     );
     statusBarItems.weekly.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.weekly);
 
     statusBarItems.sonnet = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 3
     );
     statusBarItems.sonnet.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.sonnet);
 
     statusBarItems.opus = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 4
     );
     statusBarItems.opus.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.opus);
 
     statusBarItems.credits = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 5
     );
     statusBarItems.credits.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.credits);
 
     statusBarItems.tokens = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 6
     );
     statusBarItems.tokens.command = COMMANDS.FETCH_NOW;
     context.subscriptions.push(statusBarItems.tokens);
 
     statusBarItems.compact = vscode.window.createStatusBarItem(
-        vscode.StatusBarAlignment.Right,
+        alignment,
         basePriority - 1
     );
     statusBarItems.compact.command = COMMANDS.FETCH_NOW;
