@@ -337,11 +337,55 @@ async function initializeDebugLogPath() {
     }
 }
 
+// Migrate deprecated boolean settings to new enum settings
+async function migrateDeprecatedSettings() {
+    const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
+
+    // Migrate use24HourTime (boolean) -> timeFormat (enum)
+    const use24Hour = config.inspect('statusBar.use24HourTime');
+    if (use24Hour?.globalValue === true) {
+        await config.update('statusBar.timeFormat', '24hour', vscode.ConfigurationTarget.Global);
+        await config.update('statusBar.use24HourTime', undefined, vscode.ConfigurationTarget.Global);
+        console.log('Claudemeter: Migrated use24HourTime=true -> timeFormat=24hour');
+    }
+    if (use24Hour?.workspaceValue === true) {
+        await config.update('statusBar.timeFormat', '24hour', vscode.ConfigurationTarget.Workspace);
+        await config.update('statusBar.use24HourTime', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+
+    // Migrate useCountdownTimer (boolean) -> timeFormat (enum)
+    const useCountdown = config.inspect('statusBar.useCountdownTimer');
+    if (useCountdown?.globalValue === true) {
+        await config.update('statusBar.timeFormat', 'countdown', vscode.ConfigurationTarget.Global);
+        await config.update('statusBar.useCountdownTimer', undefined, vscode.ConfigurationTarget.Global);
+        console.log('Claudemeter: Migrated useCountdownTimer=true -> timeFormat=countdown');
+    }
+    if (useCountdown?.workspaceValue === true) {
+        await config.update('statusBar.timeFormat', 'countdown', vscode.ConfigurationTarget.Workspace);
+        await config.update('statusBar.useCountdownTimer', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+
+    // Migrate useProgressBars (boolean) -> usageFormat (enum)
+    const useProgressBars = config.inspect('statusBar.useProgressBars');
+    if (useProgressBars?.globalValue === true) {
+        await config.update('statusBar.usageFormat', 'barLight', vscode.ConfigurationTarget.Global);
+        await config.update('statusBar.useProgressBars', undefined, vscode.ConfigurationTarget.Global);
+        console.log('Claudemeter: Migrated useProgressBars=true -> usageFormat=barLight');
+    }
+    if (useProgressBars?.workspaceValue === true) {
+        await config.update('statusBar.usageFormat', 'barLight', vscode.ConfigurationTarget.Workspace);
+        await config.update('statusBar.useProgressBars', undefined, vscode.ConfigurationTarget.Workspace);
+    }
+}
+
 async function activate(context) {
     // Enable debug mode in Extension Development Host (F5)
     if (context.extensionMode === vscode.ExtensionMode.Development) {
         setDevMode(true);
     }
+
+    // Migrate any deprecated boolean settings to new enum settings
+    await migrateDeprecatedSettings();
 
     // Auto-populate debugLogFile setting if empty
     await initializeDebugLogPath();

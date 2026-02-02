@@ -172,10 +172,20 @@
           "default": true,
           "description": "Show Claude service status indicator. When enabled, displays a warning/error icon if Claude services are degraded or experiencing an outage."
         },
-        "claudemeter.statusBar.use24HourTime": {
-          "type": "boolean",
-          "default": false,
-          "description": "Display times in 24-hour format (e.g., 14:30 instead of 2:30 PM)"
+        "claudemeter.statusBar.timeFormat": {
+          "type": "string",
+          "enum": [
+            "12hour",
+            "24hour",
+            "countdown"
+          ],
+          "default": "12hour",
+          "enumDescriptions": [
+            "12-hour format with AM/PM (e.g., 2:30 PM)",
+            "24-hour format (e.g., 14:30)",
+            "Countdown timer (e.g., 2h 15m)"
+          ],
+          "markdownDescription": "How to display reset times in the status bar"
         },
         "claudemeter.statusBar.alignment": {
           "type": "string",
@@ -193,10 +203,24 @@
           "maximum": 10000,
           "description": "Status bar priority (higher values position items closer to the center). Requires window reload to take effect."
         },
-        "claudemeter.statusBar.useProgressBars": {
-          "type": "boolean",
-          "default": false,
-          "description": "Display usage as progress bars (▓▓░░░) instead of percentages"
+        "claudemeter.statusBar.usageFormat": {
+          "type": "string",
+          "enum": [
+            "percent",
+            "barLight",
+            "barSolid",
+            "barSquare",
+            "barCircle"
+          ],
+          "default": "percent",
+          "enumDescriptions": [
+            "Percentage (e.g., 60%)",
+            "Light blocks (e.g., ▓▓▓░░)",
+            "Solid blocks (e.g., ███░░)",
+            "Squares (e.g., ■■■□□)",
+            "Circles (e.g., ●●●○○)"
+          ],
+          "markdownDescription": "How to display usage values in the status bar"
         },
         "claudemeter.thresholds.warning": {
           "type": "number",

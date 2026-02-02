@@ -45,34 +45,48 @@ function getStatusBarPriority() {
 }
 
 /**
- * Check if progress bars should be used instead of percentages
- * @returns {boolean}
+ * Get the usage format setting
+ * @returns {string} One of: percent, barLight, barSolid, barSquare, barCircle
  */
-function useProgressBars() {
+function getUsageFormat() {
     const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
-    return config.get('statusBar.useProgressBars', false);
+    return config.get('statusBar.usageFormat', 'percent');
 }
+
+/**
+ * Bar style definitions
+ */
+const BAR_STYLES = {
+    barLight: { filled: '▓', empty: '░' },
+    barSolid: { filled: '█', empty: '░' },
+    barSquare: { filled: '■', empty: '□' },
+    barCircle: { filled: '●', empty: '○' }
+};
 
 /**
  * Format percentage as progress bar
  * @param {number} percent - Percentage (0-100)
+ * @param {string} style - Bar style key
  * @param {number} width - Bar width in characters
  * @returns {string} Progress bar like "▓▓▓░░"
  */
-function formatAsBar(percent, width = 5) {
+function formatAsBar(percent, style, width = 5) {
     const clamped = Math.max(0, Math.min(100, percent));
     const filled = Math.round(clamped / 100 * width);
-    return '▓'.repeat(filled) + '░'.repeat(width - filled);
+    const chars = BAR_STYLES[style] || BAR_STYLES.barLight;
+    return chars.filled.repeat(filled) + chars.empty.repeat(width - filled);
 }
 
 /**
- * Format percentage, optionally as progress bar
+ * Format percentage based on usageFormat setting
  * @param {number} percent - Percentage (0-100)
- * @returns {string} Either "45%" or "▓▓░░░"
+ * @param {boolean} forCompact - Whether this is for compact mode
+ * @returns {string} Formatted value (e.g., "45%", "▓▓░░░")
  */
 function formatPercent(percent, forCompact = false) {
-    if (useProgressBars()) {
-        return formatAsBar(percent);
+    const format = getUsageFormat();
+    if (format !== 'percent') {
+        return formatAsBar(percent, format);
     }
     return forCompact ? `-${percent}%` : `${percent}%`;
 }

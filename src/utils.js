@@ -237,13 +237,44 @@ function getTokenLimit() {
     return config.get('tokenLimit', DEFAULT_TOKEN_LIMIT);
 }
 
-function getUse24HourTime() {
+function getTimeFormat() {
     const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
-    return config.get('statusBar.use24HourTime', false);
+    return config.get('statusBar.timeFormat', '12hour');
+}
+
+function getUse24HourTime() {
+    return getTimeFormat() === '24hour';
+}
+
+function getUseCountdownTimer() {
+    return getTimeFormat() === 'countdown';
+}
+
+// Format countdown string (e.g., "2h 15m", "5d 21h")
+function formatCountdown(resetTime) {
+    try {
+        const days = resetTime.match(/(\d+)d/);
+        const hours = resetTime.match(/(\d+)h/);
+        const minutes = resetTime.match(/(\d+)m/);
+
+        const parts = [];
+        if (days) parts.push(`${parseInt(days[1])}d`);
+        if (hours) parts.push(`${parseInt(hours[1])}h`);
+        if (minutes && !days) parts.push(`${parseInt(minutes[1])}m`);  // Skip minutes if days shown
+
+        return parts.join(' ') || '0m';
+    } catch (error) {
+        return '??';
+    }
 }
 
 // Parse relative time string (e.g. "2h 30m", "5d 21h") and calculate reset datetime
 function calculateResetClockTime(resetTime, timeFormat = { hour: 'numeric', minute: '2-digit' }) {
+    // If countdown mode enabled, return the relative time directly
+    if (getUseCountdownTimer()) {
+        return formatCountdown(resetTime);
+    }
+
     try {
         const days = resetTime.match(/(\d+)d/);
         const hours = resetTime.match(/(\d+)h/);
@@ -344,7 +375,9 @@ module.exports = {
     VIEWPORT,
     CLAUDE_URLS,
     getTokenLimit,
+    getTimeFormat,
     getUse24HourTime,
+    getUseCountdownTimer,
     setDevMode,
     isDebugEnabled,
     getDebugChannel,
@@ -352,6 +385,7 @@ module.exports = {
     sleep,
     calculateResetClockTime,
     calculateResetClockTimeExpanded,
+    formatCountdown,
     getCurrencySymbol,
     formatCompact,
     initFileLogger,
