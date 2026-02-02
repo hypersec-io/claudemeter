@@ -128,6 +128,48 @@ Open VS Code Settings and search for "Claudemeter" to configure:
 - **Default**: `false`
 - **Description**: Show extra usage (spending cap) in status bar (default/minimal modes only)
 
+### `claudemeter.statusBar.showServiceStatus`
+
+- **Type**: Boolean
+- **Default**: `true`
+- **Description**: Show Claude service status indicator. Displays a warning/error icon if Claude services are degraded or experiencing an outage.
+
+### `claudemeter.statusBar.timeFormat`
+
+- **Type**: String
+- **Default**: `12hour`
+- **Options**: `12hour`, `24hour`, `countdown`
+- **Description**: How to display reset times in the status bar:
+  - **12hour**: 12-hour format with AM/PM (e.g., 2:30 PM)
+  - **24hour**: 24-hour format (e.g., 14:30)
+  - **countdown**: Countdown timer (e.g., 2h 15m)
+
+### `claudemeter.statusBar.usageFormat`
+
+- **Type**: String
+- **Default**: `percent`
+- **Options**: `percent`, `barLight`, `barSolid`, `barSquare`, `barCircle`
+- **Description**: How to display usage values in the status bar:
+  - **percent**: Percentage (e.g., 60%)
+  - **barLight**: Light blocks (e.g., ▓▓▓░░)
+  - **barSolid**: Solid blocks (e.g., ███░░)
+  - **barSquare**: Squares (e.g., ■■■□□)
+  - **barCircle**: Circles (e.g., ●●●○○)
+
+### `claudemeter.statusBar.alignment`
+
+- **Type**: String
+- **Default**: `right`
+- **Options**: `left`, `right`
+- **Description**: Status bar alignment. Requires window reload to take effect.
+
+### `claudemeter.statusBar.priority`
+
+- **Type**: Number
+- **Default**: `100`
+- **Range**: `0-10000`
+- **Description**: Status bar priority (higher values position items closer to the center). Requires window reload to take effect.
+
 ### `claudemeter.debug`
 
 - **Type**: Boolean
