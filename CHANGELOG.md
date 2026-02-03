@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/hypersec-io/claudemeter/compare/v1.3.3...v1.3.4) (2026-02-03)
+
+
+### Bug Fixes
+
+* change default timeFormat to countdown ([b2c66bb](https://github.com/hypersec-io/claudemeter/commit/b2c66bb4fb9d0954c57a1202f4d7794fc348bcb7))
+
 ## [1.3.3](https://github.com/hypersec-io/claudemeter/compare/v1.3.2...v1.3.3) (2026-02-03)
 
 
