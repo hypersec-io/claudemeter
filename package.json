@@ -212,7 +212,7 @@
             "barSquare",
             "barCircle"
           ],
-          "default": "percent",
+          "default": "barCircle",
           "enumDescriptions": [
             "Percentage (e.g., 60%)",
             "Light blocks (e.g., ▓▓▓░░)",

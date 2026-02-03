@@ -50,7 +50,7 @@ function getStatusBarPriority() {
  */
 function getUsageFormat() {
     const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE);
-    return config.get('statusBar.usageFormat', 'percent');
+    return config.get('statusBar.usageFormat', 'barCircle');
 }
 
 /**

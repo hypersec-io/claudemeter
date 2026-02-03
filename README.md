@@ -147,7 +147,7 @@ Open VS Code Settings and search for "Claudemeter" to configure:
 ### `claudemeter.statusBar.usageFormat`
 
 - **Type**: String
-- **Default**: `percent`
+- **Default**: `barCircle`
 - **Options**: `percent`, `barLight`, `barSolid`, `barSquare`, `barCircle`
 - **Description**: How to display usage values in the status bar:
   - **percent**: Percentage (e.g., 60%)
